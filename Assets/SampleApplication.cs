@@ -26,16 +26,19 @@ public class SampleApplication : UserApplication
 
 		if (machine.Down)
 		{
-            
+            if (currentTetrimino != null)
+            {
+                currentTetrimino.MoveVertical(1);
+            }
         }
 
-		if (machine.Left)
-		{
-			if (currentTetrimino != null)
+        if (machine.Left)
+        {
+            if (currentTetrimino != null)
             {
                 currentTetrimino.MoveHorizontal(-1);
             }
-		}
+        }
 
         if (machine.Right)
         {
@@ -54,14 +57,9 @@ public class SampleApplication : UserApplication
             gridSquareList = new FieldGridSquareList();
             new CreateField(this.machine, gridSquareList);
 
-            currentTetrimino = new Tetrimino(machine, gridSquareList, TetriminoType.Z, (1, 2));
+            currentTetrimino = new Tetrimino(machine, TetriminoType.Z, (1, 2));
 
-            //new Block(machine, gridSquareList.GetGridSquarePositionOf((0, 1)), PixelColors.color_Cyan);
-
-            if (currentTetrimino != null)
-            {
-                //currentTetrimino.MoveHorizontal(1);
-            }
+            currentTetrimino.MoveHorizontal(1);
         }
 
         isOneced = true;

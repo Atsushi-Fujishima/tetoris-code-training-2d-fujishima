@@ -1,5 +1,4 @@
 using TetrimimoType;
-using static Unity.Collections.AllocatorManager;
 
 public enum TetriminoType
 {
@@ -11,16 +10,15 @@ public class Tetrimino
     private TetriminoType tetriminoType = TetriminoType.O;
     private IMachine machine;
     private FieldGridSquareList gridSquareList;
-    private Block[] blocks;
-    private TetriminoBase tetriminoBase = new TetriminoBase();
+    private TetriminoBase tetriminoBase;
     private (int, int) startGridSquarePosition;
 
-    public Tetrimino(IMachine machine, FieldGridSquareList gridSquareList, TetriminoType tetriminoType, (int, int) startGridSquarePosition)
+    public Tetrimino(IMachine machine, TetriminoType tetriminoType, (int, int) startGridSquarePosition)
     {
         this.machine = machine;
-        this.gridSquareList = gridSquareList;
         this.tetriminoType = tetriminoType;
         this.startGridSquarePosition = startGridSquarePosition;
+        gridSquareList = FieldGridSquareList.instance;
 
         switch (tetriminoType)
         {
@@ -38,24 +36,42 @@ public class Tetrimino
 
     public void MoveHorizontal(int value)
     {
-        foreach (var block in blocks)
+        foreach (var block in tetriminoBase.Blocks)
         {
-            int set = block.GetPosition().Item1 + value;
-            if (set < 0 || set > 9)
+            if (value < 0)
+            {
+                if (block.GetCurrentGridSquare().GetGridSquarePosition().Item1 <= gridSquareList.rowsRange.Item1)
+                {
+                    return;
+                }
+            }
+            else
+            {
+                if (block.GetCurrentGridSquare().GetGridSquarePosition().Item1 >= gridSquareList.rowsRange.Item2)
+                {
+                    return;
+                }
+            }
+        }
+
+        tetriminoBase.Move((value, 0));
+    }
+
+    public void MoveVertical(int value)
+    {
+        foreach (var block in tetriminoBase.Blocks)
+        {
+            if (block.GetGridSquarePosition().Item2 >= gridSquareList.columnsRange.Item2)
             {
                 return;
             }
         }
 
-        foreach (var block in blocks)
-        {
-            block.DrawBlock(gridSquareList.GetGridSquarePositionOf((block.GetPosition().Item1 + value, block.GetPosition().Item2)));
-        }
+        tetriminoBase.Move((0, value));
     }
 
     private void Draw()
     {
-        tetriminoBase.DrawTetrimino(machine, gridSquareList, startGridSquarePosition);
-        blocks = tetriminoBase.Blocks;
+        tetriminoBase.DrawTetrimino(machine, startGridSquarePosition);
     } 
 }

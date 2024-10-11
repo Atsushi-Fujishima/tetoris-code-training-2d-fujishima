@@ -1,6 +1,7 @@
 
 public class FieldGridSquareList
 {
+    static public FieldGridSquareList instance;
     private FieldGridSquare[] gridSquareList = null;
     private readonly int allSquare = ConstList.FIELDVERTICAL * (ConstList.FIELDHORIZONTAL + ConstList.SIDEFLAMENUM);
     private readonly int flameSquare = (ConstList.FIELDVERTICAL * 2) + ConstList.FIELDHORIZONTAL;
@@ -11,6 +12,11 @@ public class FieldGridSquareList
 
     public FieldGridSquareList()
     {
+        if (instance == null) 
+        {
+            instance = this;
+        }
+
         gridSquareList = new FieldGridSquare[allSquare * flameSquare];
     }
 

@@ -2,41 +2,43 @@
 public class Block
 {
     private IMachine machine;
-    private FieldGridSquare currentGridSquare;
+    private FieldGridSquare gridSquare;
+    private (int, int) gridSquarePosition;
     private readonly byte[] color;
 
-    public Block(IMachine machine, FieldGridSquare gridSquare, byte[] color)
+    public Block(IMachine machine, (int, int) setGridSquarePosition, byte[] color)
     {
         this.machine = machine;
         this.color = color;
-        DrawBlock(gridSquare);
+        DrawBlock(setGridSquarePosition);
     }
 
-    public void DrawBlock(FieldGridSquare gridSquare)
+    public void DrawBlock((int, int) setGridSquarePos)
     {
-        if (currentGridSquare != null)
-        {
-            EraseBlock();
-        }
-
-        currentGridSquare = gridSquare;
+        gridSquarePosition = setGridSquarePos;
+        gridSquare = FieldGridSquareList.instance.GetGridSquarePositionOf(setGridSquarePos);
 
         SquarePixel.DrawSquarePixel(
             gridSquare.GetOriginalPixelPosition().Item1, gridSquare.GetOriginalPixelPosition().Item2,
             color, machine);
     }
 
-    private void EraseBlock()
+    public void EraseBlock()
     {
         byte[] eraseColor = PixelColors.color_Black;
 
         SquarePixel.DrawSquarePixel(
-            currentGridSquare.GetOriginalPixelPosition().Item1, currentGridSquare.GetOriginalPixelPosition().Item2,
+            gridSquare.GetOriginalPixelPosition().Item1, gridSquare.GetOriginalPixelPosition().Item2,
             eraseColor, machine);
     }
 
-    public (int, int) GetPosition()
+    public FieldGridSquare GetCurrentGridSquare()
     {
-        return currentGridSquare.GetGridSquarePosition();
+        return gridSquare;
+    }
+
+    public (int, int) GetGridSquarePosition()
+    {
+        return gridSquarePosition;
     }
 }
