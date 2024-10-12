@@ -3,8 +3,6 @@ public class FieldGridSquareList
 {
     static public FieldGridSquareList instance;
     private FieldGridSquare[] gridSquareList = null;
-    private readonly int allSquare = ConstList.FIELDVERTICAL * (ConstList.FIELDHORIZONTAL + ConstList.SIDEFLAMENUM);
-    private readonly int flameSquare = (ConstList.FIELDVERTICAL * 2) + ConstList.FIELDHORIZONTAL;
 
     // range
     public readonly (int, int) columnsRange = new(0, ConstList.FIELDVERTICAL - 1);
@@ -15,9 +13,11 @@ public class FieldGridSquareList
         if (instance == null) 
         {
             instance = this;
-        }
 
-        gridSquareList = new FieldGridSquare[allSquare * flameSquare];
+            int allSquare = ConstList.FIELDVERTICAL * (ConstList.FIELDHORIZONTAL + ConstList.SIDEFLAMENUM);
+            int flameSquare = (ConstList.FIELDVERTICAL * 2);
+            gridSquareList = new FieldGridSquare[allSquare - flameSquare];
+        }
     }
 
     public void Add(int index, FieldGridSquare gridSquare)
@@ -48,4 +48,9 @@ public class FieldGridSquareList
 
         return null;
     }
+
+    public FieldGridSquare[] GetList()
+    {
+        return gridSquareList;
+    } 
 }

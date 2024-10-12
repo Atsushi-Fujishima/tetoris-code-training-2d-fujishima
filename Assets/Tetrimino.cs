@@ -7,7 +7,6 @@ public enum TetriminoType
 
 public class Tetrimino
 {
-    private TetriminoType tetriminoType = TetriminoType.O;
     private IMachine machine;
     private FieldGridSquareList gridSquareList;
     private TetriminoBase tetriminoBase;
@@ -16,7 +15,6 @@ public class Tetrimino
     public Tetrimino(IMachine machine, TetriminoType tetriminoType, (int, int) startGridSquarePosition)
     {
         this.machine = machine;
-        this.tetriminoType = tetriminoType;
         this.startGridSquarePosition = startGridSquarePosition;
         gridSquareList = FieldGridSquareList.instance;
 
@@ -59,19 +57,21 @@ public class Tetrimino
 
     public void MoveVertical(int value)
     {
-        foreach (var block in tetriminoBase.Blocks)
-        {
-            if (block.GetGridSquarePosition().Item2 >= gridSquareList.columnsRange.Item2)
-            {
-                return;
-            }
-        }
-
         tetriminoBase.Move((0, value));
+    }
+
+    public void Rotate()
+    {
+        tetriminoBase.Rotate();
+    }
+
+    public bool GetIsConfirm()
+    {
+        return tetriminoBase.IsConfirm;
     }
 
     private void Draw()
     {
         tetriminoBase.DrawTetrimino(machine, startGridSquarePosition);
-    } 
+    }
 }

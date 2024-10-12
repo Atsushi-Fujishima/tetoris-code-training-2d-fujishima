@@ -2,15 +2,13 @@
 public class CreateField
 {
     private IMachine machine;
-    private FieldGridSquareList gridSquareList;
     private (int, int) flameStartPixelPosition = new(0, 0);
     private (int, int) gridSquareStartPixlPosition = new(0, 0);
     private readonly int totalBlockSize = ConstList.BLOCKSIZE + ConstList.GRIDSQUAREGAP;
 
-    public CreateField(IMachine machine, FieldGridSquareList gridSquareList)
+    public CreateField(IMachine machine)
     {
         this.machine = machine;
-        this.gridSquareList = gridSquareList;
         CreateFieldFrame();
         CreateFieldGridSquares();
     }
@@ -62,7 +60,7 @@ public class CreateField
                 (int, int) originPixelPos = new (gridSquareStartPixlPosition.Item1 + h * totalBlockSize, gridSquareStartPixlPosition.Item2 - v * totalBlockSize);
                 (int, int) gridSquarePos = new (h, v);
                 FieldGridSquare gridSquare = new FieldGridSquare(gridSquarePos, originPixelPos, machine);
-                gridSquareList.Add(count, gridSquare);
+                FieldGridSquareList.instance.Add(count, gridSquare);
                 count++;
             }
         }
