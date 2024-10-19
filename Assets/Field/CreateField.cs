@@ -9,11 +9,11 @@ public class CreateField
     public CreateField(IMachine machine)
     {
         this.machine = machine;
-        CreateFieldFrame();
+        CreateFieldFrame(PixelColors.color_White);
         CreateFieldGridSquares();
     }
 
-    public void CreateFieldFrame()
+    public void CreateFieldFrame(byte[] color)
     {
         (int, int) underStartPosition = new (flameStartPixelPosition.Item1 + totalBlockSize, flameStartPixelPosition.Item2);
         (int, int) rightStartPosition = new (0, 0);
@@ -24,7 +24,7 @@ public class CreateField
             int h = i * totalBlockSize + underStartPosition.Item1;
 
             (int, int) pos = new (h, flameStartPixelPosition.Item2);
-            SquarePixel.DrawSquarePixel(pos.Item1, pos.Item2, PixelColors.color_White, machine);
+            SquarePixel.DrawSquarePixel(pos.Item1, pos.Item2, color, machine);
 
             rightStartPosition = new (pos.Item1 + totalBlockSize, flameStartPixelPosition.Item2);
         }
@@ -37,8 +37,8 @@ public class CreateField
             (int, int) posl = new (flameStartPixelPosition.Item1, v);
             (int, int) posr = new (rightStartPosition.Item1, v);
 
-            SquarePixel.DrawSquarePixel(posl.Item1, posl.Item2, PixelColors.color_White, machine);
-            SquarePixel.DrawSquarePixel(posr.Item1, posr.Item2, PixelColors.color_White, machine);
+            SquarePixel.DrawSquarePixel(posl.Item1, posl.Item2, color, machine);
+            SquarePixel.DrawSquarePixel(posr.Item1, posr.Item2, color, machine);
 
             gridSquareStartPixlPosition = posl;
         }

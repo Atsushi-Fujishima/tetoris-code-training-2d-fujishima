@@ -21,6 +21,7 @@ namespace TetrimimoType
 
         public bool IsConfirm
         {
+            set {  isConfirm = value; }
             get { return isConfirm; }
         }
 
@@ -31,55 +32,43 @@ namespace TetrimimoType
 
         public void Move((int, int) vector)
         {
-            if (IsMove())
+            var currentPositions = new (int, int)[blocks.Length];
+            var nextPositions = new (int, int)[blocks.Length];
+
+            for (int i = 0; i < blocks.Length; i++)
             {
-                var currentPositions = new (int, int)[blocks.Length];
-                var nextPositions = new (int, int)[blocks.Length];
-
-                for (int i = 0; i < blocks.Length; i++)
-                {
-                    currentPositions[i] = blocks[i].GetGridSquarePosition();
-                    nextPositions[i] = new(currentPositions[i].Item1 + vector.Item1, currentPositions[i].Item2 + vector.Item2);
-                }
-
-                foreach (var block in blocks)
-                {
-                    block.EraseBlock();
-                    block.GetCurrentGridSquare().IsInBlock = false;
-                }
-
-                // move
-                for (int i = 0; i < blocks.Length; i++)
-                {
-                    blocks[i].DrawBlock(nextPositions[i]);
-                    blocks[i].GetCurrentGridSquare().IsInBlock = true;
-                }
+                currentPositions[i] = blocks[i].GetGridSquarePosition();
+                nextPositions[i] = new(currentPositions[i].Item1 + vector.Item1, currentPositions[i].Item2 + vector.Item2);
             }
-            else
+
+            foreach (var block in blocks)
             {
-                isConfirm = true;
-                return;
+                block.EraseBlock();
+            }
+
+            // move
+            for (int i = 0; i < blocks.Length; i++)
+            {
+                blocks[i].DrawBlock(nextPositions[i]);
             }
         }
 
         public void Rotate()
         {
+            var currentPositions = new (int, int)[blocks.Length];
+            for (int i = 0; i < blocks.Length; i++)
+            {
+                currentPositions[i] = blocks[i].GetGridSquarePosition();
+            }
+
             (int, int)[] rotationPositions = new (int, int)[blocks.Length];
             (int, int) xRange = new(100, 0); // (min , max)
             int yMax = 0;
             
-            foreach (var block in blocks)
-            {
-                block.EraseBlock();
-                block.GetCurrentGridSquare().IsInBlock = false;
-            }
-
             for (int i = 0; i < blocks.Length; i++)
             {
                 var centerPos = blocks[0].GetGridSquarePosition();
                 var blockPos = blocks[i].GetGridSquarePosition();
-
-                UnityEngine.Debug.Log("pos" + blockPos.Item1 + ", " + blockPos.Item2);
 
                 // ‘Š‘ÎÀ•W
                 int relativeX = blockPos.Item1 - centerPos.Item1;
@@ -103,30 +92,83 @@ namespace TetrimimoType
 
             for (int i = 0; i < blocks.Length; i++)
             {
-                if (xRange.Item1 < FieldGridSquareList.instance.rowsRange.Item1)
+                int xRowsMin = FieldGridSquareList.instance.rowsRange.Item1;
+                int xRowsMax = FieldGridSquareList.instance.rowsRange.Item2;
+                int yColumnsMax = FieldGridSquareList.instance.columnsRange.Item2;
+
+                if (xRange.Item1 < xRowsMin)
                 {
-                    rotationPositions[i].Item1 += 1;
+                    rotationPositions[i].Item1 += xRowsMin - xRange.Item1;
                 }
 
-                if (xRange.Item2 > FieldGridSquareList.instance.rowsRange.Item2)
+                if (xRange.Item2 > xRowsMax)
                 {
-                    rotationPositions[i].Item1 -= 1;
+                    rotationPositions[i].Item1 += xRowsMax - xRange.Item2;
                 }
 
-                if (yMax > FieldGridSquareList.instance.columnsRange.Item2)
+                if (yMax > yColumnsMax)
                 {
-                    rotationPositions[i].Item2 -= 1;
+                    rotationPositions[i].Item2 -= yColumnsMax - yMax;
                 }
+            }
 
+            if (IsDuplicate(currentPositions, rotationPositions, FieldGridSquareList.instance))
+            {
+                return;
+            }
+
+            foreach (var block in blocks)
+            {
+                block.EraseBlock();
+            }
+
+            for (int i = 0; i < blocks.Length; i++)
+            {
                 blocks[i].DrawBlock(rotationPositions[i]);
-                blocks[i].GetCurrentGridSquare().IsInBlock = true;
             }
         }
 
-        private bool IsMove()
+        public bool IsMoveHorizontal(int value)
+        {
+            FieldGridSquareList gridSquareList = FieldGridSquareList.instance;
+            var currentPositions = new (int, int)[blocks.Length];
+            var sidePositions = new (int, int)[blocks.Length];
+
+            for (int i = 0; i < blocks.Length; i++)
+            {
+                currentPositions[i] = blocks[i].GetGridSquarePosition();
+                sidePositions[i] = (currentPositions[i].Item1 + value, currentPositions[i].Item2);
+            }
+
+            foreach (var block in blocks)
+            {
+                if (value < 0)
+                {
+                    if (block.GetCurrentGridSquare().GetGridSquarePosition().Item1 <= gridSquareList.rowsRange.Item1)
+                    {
+                        return false;
+                    }
+                }
+                else
+                {
+                    if (block.GetCurrentGridSquare().GetGridSquarePosition().Item1 >= gridSquareList.rowsRange.Item2)
+                    {
+                        return false;
+                    }
+                }
+            }
+
+            if (IsDuplicate(currentPositions, sidePositions, gridSquareList))
+            {
+                return false;
+            }
+
+            return true;
+        }
+
+        public bool IsMoveDown()
         {
             int downAmount = 1;
-            bool isDuplicate = false;
             var currentPositions = new (int, int)[blocks.Length];
             var downPositions = new (int, int)[blocks.Length];
             FieldGridSquareList gridSquareList = FieldGridSquareList.instance;
@@ -139,45 +181,57 @@ namespace TetrimimoType
 
             foreach (var dPos in downPositions)
             {
-                // null check
                 FieldGridSquare gs = gridSquareList.GetGridSquarePositionOf(dPos);
+
                 if (gs == null)
                 {
-                    UnityEngine.Debug.Log("a");
                     return false;
                 }
 
-                // field range check
-                if (gs.GetGridSquarePosition().Item2 == 20)
+                if (gs.GetGridSquarePosition().Item2 == ConstList.FIELDVERTICAL)
                 {
-                    UnityEngine.Debug.Log("b");
-                    UnityEngine.Debug.Log(gs.GetGridSquarePosition());
-                    return false;
-                    
-                }
-                else
-                {
-                    UnityEngine.Debug.Log(gs.GetGridSquarePosition());
-                }
-
-                // duplicate check in currentPositions
-                foreach (var cPos in currentPositions)
-                {
-                    if (dPos == cPos)
-                    {
-                        isDuplicate = true;
-                        break;
-                    }
-                }
-
-                if (isDuplicate == false && gs.IsInBlock)
-                {
-                    UnityEngine.Debug.Log("c");
                     return false;
                 }
             }
 
+            if (IsDuplicate(currentPositions, downPositions, gridSquareList))
+            {
+                return false;
+            }
+
             return true;
+        }
+
+        private bool IsDuplicate((int, int)[] currentPositions, (int, int)[] afterPositions, FieldGridSquareList gridList)
+        {
+            foreach (var aPos in afterPositions)
+            {
+                bool isDuplicateInTetrimino = false;
+                var grid = gridList.GetGridSquarePositionOf(aPos);
+
+                foreach (var cPos in currentPositions)
+                {
+                    if (aPos == cPos)
+                    {
+                        isDuplicateInTetrimino = true;
+                        break;
+                    }
+                }
+
+                if (grid != null)
+                {
+                    if (isDuplicateInTetrimino == false && grid.InBlock != null)
+                    {
+                        return true;
+                    }
+                }
+                else
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
     }
 }

@@ -8,7 +8,6 @@ public enum TetriminoType
 public class Tetrimino
 {
     private IMachine machine;
-    private FieldGridSquareList gridSquareList;
     private TetriminoBase tetriminoBase;
     private (int, int) startGridSquarePosition;
 
@@ -16,17 +15,16 @@ public class Tetrimino
     {
         this.machine = machine;
         this.startGridSquarePosition = startGridSquarePosition;
-        gridSquareList = FieldGridSquareList.instance;
 
         switch (tetriminoType)
         {
-            case TetriminoType.I: break;
+            case TetriminoType.I: tetriminoBase = new TetriminoI();  break;
             case TetriminoType.O: tetriminoBase = new TetriminoO(); break;
-            case TetriminoType.S: break;
+            case TetriminoType.S: tetriminoBase = new TetriminoS(); break;
             case TetriminoType.Z: tetriminoBase = new TetriminoZ(); break;
-            case TetriminoType.J: break;
-            case TetriminoType.L: break;
-            case TetriminoType.T: break;
+            case TetriminoType.J: tetriminoBase = new TetriminoJ(); break;
+            case TetriminoType.L: tetriminoBase = new TetriminoL(); break;
+            case TetriminoType.T: tetriminoBase = new TetriminoT(); break;
         }
 
         Draw();
@@ -34,35 +32,38 @@ public class Tetrimino
 
     public void MoveHorizontal(int value)
     {
-        foreach (var block in tetriminoBase.Blocks)
+        if (tetriminoBase.IsMoveHorizontal(value))
         {
-            if (value < 0)
-            {
-                if (block.GetCurrentGridSquare().GetGridSquarePosition().Item1 <= gridSquareList.rowsRange.Item1)
-                {
-                    return;
-                }
-            }
-            else
-            {
-                if (block.GetCurrentGridSquare().GetGridSquarePosition().Item1 >= gridSquareList.rowsRange.Item2)
-                {
-                    return;
-                }
-            }
+            tetriminoBase.Move((value, 0));
         }
 
-        tetriminoBase.Move((value, 0));
+        if (tetriminoBase.IsMoveDown())
+        {
+            if (tetriminoBase.IsConfirm) tetriminoBase.IsConfirm = false;
+        }
     }
 
     public void MoveVertical(int value)
     {
-        tetriminoBase.Move((0, value));
+        if (tetriminoBase.IsMoveDown())
+        {
+            tetriminoBase.Move((0, value));
+            if (tetriminoBase.IsConfirm) tetriminoBase.IsConfirm = false;
+        }
+        else
+        {
+            tetriminoBase.IsConfirm = true;
+        }
     }
 
     public void Rotate()
     {
         tetriminoBase.Rotate();
+
+        if (tetriminoBase.IsMoveDown())
+        {
+            if (tetriminoBase.IsConfirm) tetriminoBase.IsConfirm = false;
+        }
     }
 
     public bool GetIsConfirm()

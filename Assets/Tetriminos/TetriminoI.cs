@@ -1,11 +1,11 @@
 
 namespace TetrimimoType
 {
-    public class TetriminoZ : TetriminoBase
+    public class TetriminoI : TetriminoBase
     {
         public override void DrawTetrimino(IMachine machine, (int, int) startGridSquarePosition)
         {
-            color = PixelColors.color_Red;
+            color = PixelColors.color_LightBlue;
 
             (int, int) setGridSquarePosition = startGridSquarePosition;
             blocks[0] = new Block(machine, setGridSquarePosition, color);
@@ -13,12 +13,11 @@ namespace TetrimimoType
             setGridSquarePosition = new(startGridSquarePosition.Item1, startGridSquarePosition.Item2 - 1);
             blocks[1] = new Block(machine, setGridSquarePosition, color);
 
-            setGridSquarePosition = new(startGridSquarePosition.Item1 - 1, startGridSquarePosition.Item2);
+            setGridSquarePosition = new(startGridSquarePosition.Item1, startGridSquarePosition.Item2 + 1);
             blocks[2] = new Block(machine, setGridSquarePosition, color);
 
-            setGridSquarePosition = new(startGridSquarePosition.Item1 + 1, startGridSquarePosition.Item2 - 1);
+            setGridSquarePosition = new(startGridSquarePosition.Item1, startGridSquarePosition.Item2 + 2);
             blocks[3] = new Block(machine, setGridSquarePosition, color);
         }
     }
 }
-

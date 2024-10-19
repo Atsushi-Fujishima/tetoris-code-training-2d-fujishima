@@ -6,6 +6,8 @@ public class Block
     private (int, int) gridSquarePosition;
     private readonly byte[] color;
 
+    public byte[] Color { get { return color; } }
+
     public Block(IMachine machine, (int, int) setGridSquarePosition, byte[] color)
     {
         this.machine = machine;
@@ -21,6 +23,8 @@ public class Block
         SquarePixel.DrawSquarePixel(
             gridSquare.GetOriginalPixelPosition().Item1, gridSquare.GetOriginalPixelPosition().Item2,
             color, machine);
+
+        gridSquare.InBlock = this;
     }
 
     public void EraseBlock()
@@ -30,6 +34,8 @@ public class Block
         SquarePixel.DrawSquarePixel(
             gridSquare.GetOriginalPixelPosition().Item1, gridSquare.GetOriginalPixelPosition().Item2,
             eraseColor, machine);
+
+        gridSquare.InBlock = null;
     }
 
     public FieldGridSquare GetCurrentGridSquare()

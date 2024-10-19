@@ -2,25 +2,26 @@
 public class FieldGridSquare
 {
     // 座標にブロックがあるかどうか
-    private bool isInBlock = false;
-
+    private Block inBlock = null;
+    private byte[] color = new byte[3];
     private (int, int) gridSquarePosition;
     private (int, int) originalPixelPosition;
     private IMachine machine;
 
-    public bool IsInBlock
+    public Block InBlock
     {
-        set { isInBlock = value; }
-        get { return isInBlock; }
+        set { inBlock = value; }
+        get { return inBlock; }
     }
 
     public FieldGridSquare((int, int) gridSquarePosition, (int, int) originalPixelPosition, IMachine machine)
     {
-        isInBlock = false;
+        inBlock = null;
+        color = PixelColors.color_Black;
         this.machine = machine;
         this.gridSquarePosition = gridSquarePosition;
         this.originalPixelPosition = originalPixelPosition;
-        CreatePixelsPosition(PixelColors.color_DarkBlue);
+        CreatePixelsPosition(color);
     }
 
     public (int, int) GetGridSquarePosition()
@@ -35,8 +36,9 @@ public class FieldGridSquare
 
     public void Clear()
     {
-        isInBlock = false;
-        CreatePixelsPosition(PixelColors.color_Black);
+        inBlock = null;
+        color = PixelColors.color_Black;
+        CreatePixelsPosition(color);
     }
 
     private void CreatePixelsPosition(byte[] color)
